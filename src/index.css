@@ -56,6 +56,7 @@ button {
   color: white;
   cursor: pointer;
   font: inherit;
+  transition: opacity 0.2s ease, background 0.2s ease;
 }
 
 button.boton-activo {
@@ -67,6 +68,25 @@ button.boton-activo {
 button:disabled {
   opacity: 0.6;
   cursor: wait;
+}
+
+.alerta-info {
+  padding: 14px 18px;
+  margin: 20px 0;
+  border: 1px solid #b6d4fe;
+  border-radius: 8px;
+  background: #cfe2ff;
+  color: #084298;
+  font-weight: 500;
+}
+
+.mensaje-vacio {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px dashed #ced4da;
+  border-radius: 8px;
+  color: #6c757d;
+  font-style: italic;
 }
 
 .tarjetas-libros {

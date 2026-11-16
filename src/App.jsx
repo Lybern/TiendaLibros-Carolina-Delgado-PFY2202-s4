@@ -8,10 +8,15 @@ import PaginaNoEncontrada from "./pages/PaginaNoEncontrada";
 export default function App() {
   const [libros, setLibros] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
+  // Estado para controlar cuándo una petición está en progreso
+  const [cargando, setCargando] = useState(true);
 
   // Función para consultar libros al servicio mock según la categoría seleccionada
   function cargarLibros(categoria = "Todas") {
     setCategoriaActiva(categoria);
+    // Activamos el estado de carga antes de iniciar la solicitud de red
+    setCargando(true);
+
     const ruta =
       categoria === "Todas"
         ? "/api/books"
@@ -22,7 +27,11 @@ export default function App() {
       .then((datos) => setLibros(datos))
       .catch((error) =>
         console.error("Error al obtener los libros:", error)
-      );
+      )
+      // finally se ejecuta siempre, ya sea que la petición haya sido exitosa o con fallo
+      .finally(() => {
+        setCargando(false);
+      });
   }
 
   // Al cargar la aplicación por primera vez, solicitamos todos los libros
@@ -51,6 +60,7 @@ export default function App() {
             element={
               <Libros
                 libros={libros}
+                cargando={cargando}
                 categoriaActiva={categoriaActiva}
                 cambiarCategoria={cargarLibros}
               />
