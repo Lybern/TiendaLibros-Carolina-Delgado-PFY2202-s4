@@ -48,6 +48,18 @@ main {
   margin: 24px 0;
 }
 
+.acciones-errores {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 24px 0;
+  padding: 10px 14px;
+  background: #eef2f6;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
 button {
   padding: 10px 16px;
   border: 0;
@@ -63,6 +75,25 @@ button.boton-activo {
   background: #15386b;
   box-shadow: 0 0 0 2px #ffc107;
   font-weight: bold;
+}
+
+button.boton-simular {
+  background: #6c757d;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+}
+
+button.boton-simular:hover {
+  background: #495057;
+}
+
+button.boton-reintentar {
+  margin-top: 10px;
+  background: #c83838;
+}
+
+button.boton-reintentar:hover {
+  background: #a22424;
 }
 
 button:disabled {
@@ -87,6 +118,15 @@ button:disabled {
   border-radius: 8px;
   color: #6c757d;
   font-style: italic;
+}
+
+.mensaje-aviso {
+  padding: 12px;
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+  color: #664d03;
+  margin-bottom: 16px;
 }
 
 .tarjetas-libros {
@@ -124,4 +164,8 @@ button:disabled {
   border-radius: 8px;
   background: #fff0f0;
   color: #8b2020;
+}
+
+.error p {
+  margin: 0;
 }

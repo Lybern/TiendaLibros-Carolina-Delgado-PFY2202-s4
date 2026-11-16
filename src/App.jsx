@@ -4,31 +4,72 @@ import Inicio from "./pages/Inicio";
 import Libros from "./pages/Libros";
 import PaginaNoEncontrada from "./pages/PaginaNoEncontrada";
 
+// ============================================================================
+// FUNCIÓN AUXILIAR PARA CONSULTAR LIBROS Y GESTIONAR CÓDIGOS DE ESTADO HTTP
+// Captura códigos 404, 500 y caídas de conexión para devolver mensajes legibles.
+// ============================================================================
+async function obtenerLibros(categoria = "Todas", tipoError = "", signal) {
+  let ruta =
+    categoria === "Todas"
+      ? "/api/books"
+      : `/api/books?genre=${encodeURIComponent(categoria)}`;
+
+  if (tipoError) {
+    ruta += (ruta.includes("?") ? "&" : "?") + `error=${tipoError}`;
+  }
+
+  try {
+    const respuesta = await fetch(ruta, { signal });
+
+    // Si la respuesta no es exitosa (código fuera del rango 200-299)
+    if (!respuesta.ok) {
+      if (respuesta.status === 404) {
+        throw new Error(
+          "No se encontraron los libros para la categoría solicitada (Error 404)."
+        );
+      }
+      if (respuesta.status === 500) {
+        throw new Error(
+          "El servidor experimentó un fallo interno al procesar los libros (Error 500)."
+        );
+      }
+      throw new Error("Ocurrió un error inesperado al consultar los datos.");
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    // Si falla la red o se interrumpe la comunicación, se produce un TypeError
+    if (error instanceof TypeError) {
+      throw new Error(
+        "No fue posible conectar con el servidor. Revisa tu conexión y vuelve a intentar."
+      );
+    }
+    throw error;
+  }
+}
+
 // Componente principal que define la navegación y las rutas de la aplicación
 export default function App() {
   const [libros, setLibros] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
-  // Estado para controlar cuándo una petición está en progreso
   const [cargando, setCargando] = useState(true);
+  // Estado para registrar mensajes de error cuando falla una petición
+  const [error, setError] = useState("");
 
-  // Función para consultar libros al servicio mock según la categoría seleccionada
-  function cargarLibros(categoria = "Todas") {
+  // Función para cargar libros según categoría y permitir simular errores
+  function cargarLibros(categoria = categoriaActiva, tipoError = "") {
     setCategoriaActiva(categoria);
-    // Activamos el estado de carga antes de iniciar la solicitud de red
     setCargando(true);
+    // Limpiamos cualquier error previo antes de la nueva consulta
+    setError("");
 
-    const ruta =
-      categoria === "Todas"
-        ? "/api/books"
-        : `/api/books?genre=${encodeURIComponent(categoria)}`;
-
-    fetch(ruta)
-      .then((respuesta) => respuesta.json())
-      .then((datos) => setLibros(datos))
-      .catch((error) =>
-        console.error("Error al obtener los libros:", error)
-      )
-      // finally se ejecuta siempre, ya sea que la petición haya sido exitosa o con fallo
+    obtenerLibros(categoria, tipoError)
+      .then((datos) => {
+        setLibros(datos);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
       .finally(() => {
         setCargando(false);
       });
@@ -61,8 +102,9 @@ export default function App() {
               <Libros
                 libros={libros}
                 cargando={cargando}
+                error={error}
                 categoriaActiva={categoriaActiva}
-                cambiarCategoria={cargarLibros}
+                cargarLibros={cargarLibros}
               />
             }
           />
