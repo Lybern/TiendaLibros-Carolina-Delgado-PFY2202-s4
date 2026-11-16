@@ -3,10 +3,8 @@ import { handlers } from "./handlers.js";
 
 // ============================================================================
 // CONFIGURACIÓN DEL SERVICE WORKER EN EL NAVEGADOR
-// setupWorker toma la lista de handlers definidos y los registra en el
-// Service Worker (public/mockServiceWorker.js) para interceptar solicitudes
-// HTTP locales antes de que salgan a internet.
-// Nota importante de la clase: En Vite (ES Modules) es buena práctica poner la
-// extensión .js explícita para evitar fallos de resolución en el navegador.
+// setupWorker registra las reglas de interceptación definidas en handlers.js
+// dentro del Service Worker del navegador (mockServiceWorker.js).
+// Al incluir la extensión .js evitamos problemas de resolución de módulos nativos.
 // ============================================================================
 export const worker = setupWorker(...handlers);

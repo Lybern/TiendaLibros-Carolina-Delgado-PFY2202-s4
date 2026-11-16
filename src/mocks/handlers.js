@@ -2,8 +2,8 @@ import { http, HttpResponse, delay } from "msw";
 
 // ============================================================================
 // 1. LISTA DE CATEGORÍAS DISPONIBLES
-// Exportamos esta lista para que los componentes de React puedan crear
-// los botones o enlaces de navegación de forma dinámica.
+// Exportamos esta lista para que los componentes puedan generar los botones
+// y enlaces de navegación de forma dinámica.
 // ============================================================================
 export const CATEGORIAS_DISPONIBLES = [
   "Ficción",
@@ -15,10 +15,9 @@ export const CATEGORIAS_DISPONIBLES = [
 
 // ============================================================================
 // 2. DATOS SIMULADOS ORGANIZADOS POR GÉNERO (booksByGenre)
-// Siguiendo la Guía de Duoc:
-//  - Cada libro tiene título, autor y precio.
-//  - "Drama" se deja con un arreglo vacío [] intencionalmente para evaluar
-//    cómo reacciona la interfaz cuando no existen libros en una categoría.
+// Cada categoría contiene una lista de libros con sus datos principales.
+// La categoría "Drama" se deja vacía intencionalmente para comprobar cómo
+// responde la interfaz cuando una categoría no contiene libros disponibles.
 // ============================================================================
 export const booksByGenre = {
   "Ficción": [
@@ -27,14 +26,14 @@ export const booksByGenre = {
       title: "1984",
       author: "George Orwell",
       price: 12990,
-      description: "Novela distópica sobre la vigilancia y el control totalitario.",
+      description: "Novela distópica sobre la vigilancia y el control del pensamiento.",
     },
     {
       id: 2,
       title: "Cien años de soledad",
       author: "Gabriel García Márquez",
       price: 16990,
-      description: "Obra cumbre del realismo mágico y la saga de la familia Buendía.",
+      description: "Historia de la familia Buendía en el pueblo ficticio de Macondo.",
     },
   ],
   "Ciencia Ficción": [
@@ -43,14 +42,14 @@ export const booksByGenre = {
       title: "Dune",
       author: "Frank Herbert",
       price: 21990,
-      description: "Epopeya intergaláctica en el planeta desértico Arrakis.",
+      description: "Novela de ciencia ficción ambientada en el planeta desértico Arrakis.",
     },
     {
       id: 4,
       title: "Fundación",
       author: "Isaac Asimov",
       price: 14990,
-      description: "La psicohistoria y el esfuerzo por preservar el saber galáctico.",
+      description: "Un científico utiliza la psicohistoria para prever la caída de un imperio.",
     },
   ],
   "Misterio": [
@@ -59,14 +58,14 @@ export const booksByGenre = {
       title: "Las aventuras de Sherlock Holmes",
       author: "Arthur Conan Doyle",
       price: 11990,
-      description: "Casos clásicos del legendario detective de Baker Street.",
+      description: "Colección de relatos protagonizados por el detective Sherlock Holmes.",
     },
     {
       id: 6,
       title: "Asesinato en el Orient Express",
       author: "Agatha Christie",
       price: 13990,
-      description: "El detective Hércules Poirot busca al culpable en un tren varado.",
+      description: "Un detective debe resolver un crimen cometido dentro de un tren de lujo.",
     },
   ],
   "Fantasía": [
@@ -75,38 +74,35 @@ export const booksByGenre = {
       title: "El Señor de los Anillos: La Comunidad del Anillo",
       author: "J. R. R. Tolkien",
       price: 22990,
-      description: "El inicio del épico viaje para destruir el Anillo Único.",
+      description: "Un grupo de héroes emprende una misión para destruir un anillo de gran poder.",
     },
     {
       id: 8,
       title: "El nombre del viento",
       author: "Patrick Rothfuss",
       price: 19990,
-      description: "Las memorias del legendario mago y músico Kvothe.",
+      description: "Un mago legendario narra su propia historia desde su juventud errante.",
     },
   ],
-  // Categoría vacía requerida por la Guía de Aprendizaje Duoc:
+  // Categoría vacía para probar el estado sin libros:
   "Drama": [],
 };
 
 // ============================================================================
-// 3. HANDLERS DE INTERCEPTACIÓN HTTP CON MSW
-// Aquí definimos las rutas que el Service Worker va a capturar.
+// 3. INTERCEPTOR DE PETICIONES HTTP
+// Captura las llamadas a "/api/books" y devuelve los datos según los parámetros recibidos.
 // ============================================================================
 export const handlers = [
-  // Interceptamos peticiones GET a "/api/books"
   http.get("/api/books", async ({ request }) => {
-    // A) Simulación de latencia de red:
-    // Pausamos la ejecución por 1000 milisegundos (1 segundo) para que
-    // en el frontend se pueda apreciar el indicador de carga (loading spinner).
+    // Simulamos un retraso de 1 segundo para observar el estado de carga en la pantalla
     await delay(1000);
 
-    // B) Lectura de parámetros en la URL (Query Params):
+    // Leemos los parámetros que vienen en la dirección URL
     const url = new URL(request.url);
     const genre = url.searchParams.get("genre");
     const errorSimulado = url.searchParams.get("error");
 
-    // C) Simulación manual de errores HTTP (para evaluar la Pauta de errores):
+    // Respuestas controladas para probar la reacción ante errores del servidor
     if (errorSimulado === "500") {
       return HttpResponse.json(
         { message: "Error interno del servidor simulado (500)" },
@@ -121,21 +117,21 @@ export const handlers = [
       );
     }
 
-    // D) Si el usuario solicitó un género específico:
+    // Si se especifica una categoría en la consulta:
     if (genre && genre !== "Todas") {
-      // Si el género no existe en nuestra base de datos simulada:
+      // Si la categoría no existe en los registros, retornamos código 404
       if (!Object.prototype.hasOwnProperty.call(booksByGenre, genre)) {
         return HttpResponse.json(
-          { message: `El género '${genre}' no fue encontrado.` },
+          { message: `La categoría '${genre}' no existe en el catálogo.` },
           { status: 404 }
         );
       }
 
-      // Si el género existe, devolvemos su arreglo (incluso si está vacío como Drama)
+      // Si existe, retornamos los libros correspondientes a esa categoría
       return HttpResponse.json(booksByGenre[genre], { status: 200 });
     }
 
-    // E) Si no se especifica género o se pide "Todas", entregamos todos los libros:
+    // Si no se indica categoría o se solicita "Todas", devolvemos la lista completa
     const todosLosLibros = Object.values(booksByGenre).flat();
     return HttpResponse.json(todosLosLibros, { status: 200 });
   }),
