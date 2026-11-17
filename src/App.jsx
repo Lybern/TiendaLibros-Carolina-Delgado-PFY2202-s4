@@ -139,6 +139,11 @@ export default function App() {
           <Route path="*" element={<PaginaNoEncontrada />} />
         </Routes>
       </main>
+
+      {/* Pie de página semántico con información del proyecto */}
+      <footer>
+        <p>Tienda de Libros &copy; 2026 — Aplicación web interactiva desarrollada con React y Mock Service Worker.</p>
+      </footer>
     </div>
   );
 }

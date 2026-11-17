@@ -1,4 +1,7 @@
-// Componente para visualizar el catálogo de libros y filtrar por categorías
+import { CATEGORIAS_DISPONIBLES } from "../constants/categorias.js";
+import TarjetaLibro from "../components/TarjetaLibro.jsx";
+
+// Componente de página para visualizar el catálogo y filtrar por categorías
 export default function Libros({
   libros = [],
   cargando = false,
@@ -6,14 +9,8 @@ export default function Libros({
   categoriaActiva = "Todas",
   cargarLibros,
 }) {
-  const categorias = [
-    "Todas",
-    "Ficción",
-    "Ciencia Ficción",
-    "Misterio",
-    "Fantasía",
-    "Drama",
-  ];
+  // Centralizamos las categorías combinando la opción general "Todas" con las constantes compartidas
+  const categorias = ["Todas", ...CATEGORIAS_DISPONIBLES];
 
   return (
     <section>
@@ -94,20 +91,11 @@ export default function Libros({
         </p>
       )}
 
-      {/* Listado de tarjetas cuando los libros están disponibles */}
+      {/* Listado de tarjetas modularizadas cuando los libros están disponibles */}
       {!cargando && libros.length > 0 && (
         <div className="tarjetas-libros">
           {libros.map((libro) => (
-            <article className="tarjeta" key={libro.id}>
-              <h2>{libro.title}</h2>
-              <p>
-                <strong>Autor:</strong> {libro.author}
-              </p>
-              <p>{libro.description}</p>
-              <p className="precio">
-                ${libro.price?.toLocaleString("es-CL")}
-              </p>
-            </article>
+            <TarjetaLibro key={libro.id} libro={libro} />
           ))}
         </div>
       )}

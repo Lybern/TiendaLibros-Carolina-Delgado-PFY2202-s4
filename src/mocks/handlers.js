@@ -1,20 +1,10 @@
 import { http, HttpResponse, delay } from "msw";
+import { CATEGORIAS_DISPONIBLES } from "../constants/categorias.js";
+
+export { CATEGORIAS_DISPONIBLES };
 
 // ============================================================================
-// 1. LISTA DE CATEGORÍAS DISPONIBLES
-// Exportamos esta lista para que los componentes puedan generar los botones
-// y enlaces de navegación de forma dinámica.
-// ============================================================================
-export const CATEGORIAS_DISPONIBLES = [
-  "Ficción",
-  "Ciencia Ficción",
-  "Misterio",
-  "Fantasía",
-  "Drama",
-];
-
-// ============================================================================
-// 2. DATOS SIMULADOS ORGANIZADOS POR GÉNERO (booksByGenre)
+// DATOS SIMULADOS ORGANIZADOS POR GÉNERO (booksByGenre)
 // Cada categoría contiene una lista de libros con sus datos principales.
 // La categoría "Drama" se deja vacía intencionalmente para comprobar cómo
 // responde la interfaz cuando una categoría no contiene libros disponibles.
@@ -89,7 +79,7 @@ export const booksByGenre = {
 };
 
 // ============================================================================
-// 3. INTERCEPTOR DE PETICIONES HTTP
+// INTERCEPTOR DE PETICIONES HTTP
 // Captura las llamadas a "/api/books" y devuelve los datos según los parámetros recibidos.
 // ============================================================================
 export const handlers = [
