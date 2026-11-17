@@ -17,6 +17,7 @@ export const booksByGenre = {
       author: "George Orwell",
       price: 12990,
       description: "Novela distópica sobre la vigilancia y el control del pensamiento.",
+      genre: "Ficción",
     },
     {
       id: 2,
@@ -24,6 +25,7 @@ export const booksByGenre = {
       author: "Gabriel García Márquez",
       price: 16990,
       description: "Historia de la familia Buendía en el pueblo ficticio de Macondo.",
+      genre: "Ficción",
     },
   ],
   "Ciencia Ficción": [
@@ -33,6 +35,7 @@ export const booksByGenre = {
       author: "Frank Herbert",
       price: 21990,
       description: "Novela de ciencia ficción ambientada en el planeta desértico Arrakis.",
+      genre: "Ciencia Ficción",
     },
     {
       id: 4,
@@ -40,6 +43,7 @@ export const booksByGenre = {
       author: "Isaac Asimov",
       price: 14990,
       description: "Un científico utiliza la psicohistoria para prever la caída de un imperio.",
+      genre: "Ciencia Ficción",
     },
   ],
   "Misterio": [
@@ -49,6 +53,7 @@ export const booksByGenre = {
       author: "Arthur Conan Doyle",
       price: 11990,
       description: "Colección de relatos protagonizados por el detective Sherlock Holmes.",
+      genre: "Misterio",
     },
     {
       id: 6,
@@ -56,6 +61,7 @@ export const booksByGenre = {
       author: "Agatha Christie",
       price: 13990,
       description: "Un detective debe resolver un crimen cometido dentro de un tren de lujo.",
+      genre: "Misterio",
     },
   ],
   "Fantasía": [
@@ -65,6 +71,7 @@ export const booksByGenre = {
       author: "J. R. R. Tolkien",
       price: 22990,
       description: "Un grupo de héroes emprende una misión para destruir un anillo de gran poder.",
+      genre: "Fantasía",
     },
     {
       id: 8,
@@ -72,6 +79,7 @@ export const booksByGenre = {
       author: "Patrick Rothfuss",
       price: 19990,
       description: "Un mago legendario narra su propia historia desde su juventud errante.",
+      genre: "Fantasía",
     },
   ],
   // Categoría vacía para probar el estado sin libros:

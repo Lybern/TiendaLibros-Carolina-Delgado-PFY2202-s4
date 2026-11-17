@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { NavLink, Route, Routes } from "react-router";
+import { Link, NavLink, Route, Routes } from "react-router";
 import Inicio from "./pages/Inicio";
 import Libros from "./pages/Libros";
 import PaginaNoEncontrada from "./pages/PaginaNoEncontrada";
@@ -109,13 +109,20 @@ export default function App() {
 
   return (
     <div className="contenedor">
-      {/* Barra de navegación superior */}
-      <header>
+      {/* Barra de navegación superior con marca y enlaces estilo píldora */}
+      <header className="cabecera-principal">
+        <Link to="/" className="logotipo-marca">
+          <span className="logotipo-icono" aria-hidden="true">📚</span>
+          <span className="logotipo-texto">TiendaLibros</span>
+        </Link>
+
         <nav aria-label="Navegación principal">
-          <NavLink to="/" end>
+          <NavLink to="/" end className="enlace-nav">
             Inicio
           </NavLink>
-          <NavLink to="/libros">Catálogo de Libros</NavLink>
+          <NavLink to="/libros" className="enlace-nav">
+            Catálogo de Libros
+          </NavLink>
         </nav>
       </header>
 
@@ -140,9 +147,11 @@ export default function App() {
         </Routes>
       </main>
 
-      {/* Pie de página semántico con información del proyecto */}
+      {/* Pie de página de la tienda */}
       <footer>
-        <p>Tienda de Libros &copy; 2026 — Aplicación web interactiva desarrollada con React y Mock Service Worker.</p>
+        <p>
+          TiendaLibros &copy; 2026 — Todos los derechos reservados.
+        </p>
       </footer>
     </div>
   );

@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { CATEGORIAS_DISPONIBLES } from "../constants/categorias.js";
 import TarjetaLibro from "../components/TarjetaLibro.jsx";
 
-// Componente de página para visualizar el catálogo y filtrar por categorías
+// Componente de página para visualizar el catálogo y filtrar por categorías y texto
 export default function Libros({
   libros = [],
   cargando = false,
@@ -9,13 +10,53 @@ export default function Libros({
   categoriaActiva = "Todas",
   cargarLibros,
 }) {
+  // Estado local para el filtro de búsqueda por texto en tiempo real
+  const [busqueda, setBusqueda] = useState("");
+
   // Centralizamos las categorías combinando la opción general "Todas" con las constantes compartidas
   const categorias = ["Todas", ...CATEGORIAS_DISPONIBLES];
 
+  // Filtramos la colección en memoria usando una función pura según el texto ingresado
+  const librosFiltrados = libros.filter((libro) => {
+    const termino = busqueda.trim().toLowerCase();
+    if (!termino) {
+      return true;
+    }
+    return (
+      libro.title.toLowerCase().includes(termino) ||
+      libro.author.toLowerCase().includes(termino)
+    );
+  });
+
   return (
     <section>
-      <h1>Catálogo de Libros</h1>
-      <p>Selecciona una categoría para explorar los libros disponibles:</p>
+      <div className="encabezado-catalogo">
+        <h1>Catálogo de Libros</h1>
+        <p>Explora nuestras obras por género o busca por título o autor:</p>
+      </div>
+
+      {/* Barra de búsqueda interactiva */}
+      <div className="contenedor-busqueda">
+        <input
+          type="search"
+          placeholder="🔍 Buscar por título o autor..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          disabled={cargando}
+          className="campo-busqueda"
+          aria-label="Buscar libros por título o autor"
+        />
+        {busqueda && (
+          <button
+            type="button"
+            onClick={() => setBusqueda("")}
+            className="boton-limpiar-busqueda"
+            title="Limpiar búsqueda"
+          >
+            &times;
+          </button>
+        )}
+      </div>
 
       {/* Botones para alternar entre categorías */}
       <div className="acciones">
@@ -52,9 +93,10 @@ export default function Libros({
         </button>
       </div>
 
-      {/* Indicador visual accesible de carga */}
+      {/* Indicador visual accesible de carga con animación de spinner */}
       {cargando && (
         <div className="alerta-info" role="status">
+          <span className="spinner" aria-hidden="true"></span>
           <p>Cargando libros del catálogo, por favor espera...</p>
         </div>
       )}
@@ -84,17 +126,31 @@ export default function Libros({
         </p>
       )}
 
-      {/* Mensaje cuando la categoría no tiene libros disponibles */}
+      {/* Mensaje cuando la categoría no tiene libros disponibles en el servidor */}
       {!cargando && !error && libros.length === 0 && (
         <p className="mensaje-vacio">
           No se encontraron libros disponibles en la categoría seleccionada.
         </p>
       )}
 
+      {/* Mensaje cuando la búsqueda no coincide con ningún libro */}
+      {!cargando && !error && libros.length > 0 && librosFiltrados.length === 0 && (
+        <p className="mensaje-vacio">
+          No se encontraron libros que coincidan con el término "{busqueda}".
+        </p>
+      )}
+
+      {/* Contador de resultados */}
+      {!cargando && librosFiltrados.length > 0 && (
+        <p className="contador-resultados">
+          Mostrando {librosFiltrados.length} {librosFiltrados.length === 1 ? "libro" : "libros"}:
+        </p>
+      )}
+
       {/* Listado de tarjetas modularizadas cuando los libros están disponibles */}
-      {!cargando && libros.length > 0 && (
+      {!cargando && librosFiltrados.length > 0 && (
         <div className="tarjetas-libros">
-          {libros.map((libro) => (
+          {librosFiltrados.map((libro) => (
             <TarjetaLibro key={libro.id} libro={libro} />
           ))}
         </div>
