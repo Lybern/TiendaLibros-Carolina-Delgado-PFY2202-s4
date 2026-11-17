@@ -85,7 +85,11 @@ button {
   color: white;
   cursor: pointer;
   font: inherit;
-  transition: opacity 0.2s ease, background 0.2s ease;
+  transition: opacity 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  opacity: 0.92;
 }
 
 button.boton-activo {
@@ -118,7 +122,11 @@ button:disabled {
   cursor: wait;
 }
 
+/* Indicador de carga con animación */
 .alerta-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   padding: 14px 18px;
   margin: 20px 0;
   border: 1px solid #b6d4fe;
@@ -126,6 +134,29 @@ button:disabled {
   background: #cfe2ff;
   color: #084298;
   font-weight: 500;
+}
+
+.alerta-info p {
+  margin: 0;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(8, 66, 152, 0.25);
+  border-top-color: #084298;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes girar {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .mensaje-vacio {
@@ -159,6 +190,13 @@ button:disabled {
   background: white;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
 }
 
 .tarjeta h2 {
