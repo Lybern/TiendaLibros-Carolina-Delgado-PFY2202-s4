@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router";
 import Inicio from "./pages/Inicio";
 import Libros from "./pages/Libros";
@@ -7,6 +7,7 @@ import PaginaNoEncontrada from "./pages/PaginaNoEncontrada";
 // ============================================================================
 // FUNCIÓN AUXILIAR PARA CONSULTAR LIBROS Y GESTIONAR CÓDIGOS DE ESTADO HTTP
 // Captura códigos 404, 500 y caídas de conexión para devolver mensajes legibles.
+// Admite el parámetro signal para permitir la cancelación mediante AbortController.
 // ============================================================================
 async function obtenerLibros(categoria = "Todas", tipoError = "", signal) {
   let ruta =
@@ -38,6 +39,11 @@ async function obtenerLibros(categoria = "Todas", tipoError = "", signal) {
 
     return await respuesta.json();
   } catch (error) {
+    // Si la petición fue cancelada intencionalmente por AbortController, propagamos el error para no tratarlo como fallo de red
+    if (error.name === "AbortError") {
+      throw error;
+    }
+
     // Si falla la red o se interrumpe la comunicación, se produce un TypeError
     if (error instanceof TypeError) {
       throw new Error(
@@ -53,14 +59,12 @@ export default function App() {
   const [libros, setLibros] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [cargando, setCargando] = useState(true);
-  // Estado para registrar mensajes de error cuando falla una petición
   const [error, setError] = useState("");
 
-  // Función para cargar libros según categoría y permitir simular errores
-  function cargarLibros(categoria = categoriaActiva, tipoError = "") {
+  // Memorizamos la función con useCallback para evitar re-renderizados innecesarios en componentes hijos
+  const cargarLibros = useCallback((categoria = "Todas", tipoError = "") => {
     setCategoriaActiva(categoria);
     setCargando(true);
-    // Limpiamos cualquier error previo antes de la nueva consulta
     setError("");
 
     obtenerLibros(categoria, tipoError)
@@ -73,11 +77,34 @@ export default function App() {
       .finally(() => {
         setCargando(false);
       });
-  }
+  }, []);
 
-  // Al cargar la aplicación por primera vez, solicitamos todos los libros
+  // Efecto inicial con AbortController para cancelar peticiones duplicadas u obsoletas
   useEffect(() => {
-    cargarLibros("Todas");
+    const controller = new AbortController();
+
+    obtenerLibros("Todas", "", controller.signal)
+      .then((datos) => {
+        setLibros(datos);
+      })
+      .catch((err) => {
+        // Ignoramos la cancelación intencional del controlador
+        if (err.name === "AbortError") {
+          return;
+        }
+        setError(err.message);
+      })
+      .finally(() => {
+        // Solo actualizamos el estado si la señal no fue abortada
+        if (!controller.signal.aborted) {
+          setCargando(false);
+        }
+      });
+
+    // Función de limpieza: aborta la petición si el componente se desmonta
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (
